@@ -13,6 +13,16 @@ defmodule YojeeWeb.Schema.Schema do
     end
   end
 
+  # Mutations
+
+  mutation do
+    @desc "Create a thread with the given attributes"
+    field :create_thread, :thread do
+      arg :title, non_null(:string)
+      resolve &Resolvers.Forum.create_thread/3
+    end
+  end
+
   # Objects
 
   object :thread do
