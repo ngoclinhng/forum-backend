@@ -9,7 +9,17 @@ defmodule Yojee.Forum do
   alias Yojee.Forum.Thread
 
   @doc """
-  Creates a Thread with the given attributes `attrs`.
+  Returns a thread whose id is given by `id`.
+
+  Returns `nil` if no such thread exists.
+  """
+  def get_thread(id) do
+    Thread
+    |> Repo.get(id)
+  end
+
+  @doc """
+  Creates a thread with the given attributes `attrs`.
 
   Returns `{:ok, %Thread{}}` if success.
 
