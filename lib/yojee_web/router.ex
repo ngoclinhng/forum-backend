@@ -5,7 +5,13 @@ defmodule YojeeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", YojeeWeb do
+  scope "/" do
     pipe_through :api
+
+    forward "/api", Absinthe.Plug,
+      schema: YojeeWeb.Schema.Schema
+
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: YojeeWeb.Schema.Schema
   end
 end
