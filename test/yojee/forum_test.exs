@@ -1,6 +1,8 @@
 defmodule Yojee.ForumTest do
   use Yojee.DataCase, asyn: true
 
+  import Yojee.Factory, only: [insert!: 1]
+
   alias Yojee.Forum
   alias Yojee.Forum.Thread
 
@@ -34,6 +36,13 @@ defmodule Yojee.ForumTest do
       assert {:error, changeset} = Forum.create_thread(%{title: s})
       assert %{title: ["should be at most 140 character(s)"]} =
         errors_on(changeset)
+    end
+  end
+
+  describe "get_thread/1" do
+    test "returns the thread with the given id" do
+      assert %Thread{id: id, title: title} = insert!(:thread)
+      assert %Thread{id: ^id, title: ^title} = Forum.get_thread(id)
     end
   end
 end
