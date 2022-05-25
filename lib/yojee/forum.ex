@@ -19,6 +19,21 @@ defmodule Yojee.Forum do
   end
 
   @doc """
+  Returns a list of `n` most popular threads, where polularity is based
+  on the number of posts: the more posts a thread has the more popular
+  it is.
+  """
+  def list_most_popular_threads(n) when is_integer(n) and n > 0 do
+    Thread
+    |> join(:left, [t], p in assoc(t, :posts))
+    |> group_by([t, p], t.id)
+    |> select_merge([t, p], %{post_count: count(p.id)})
+    |> order_by([t, p], desc: count(p.id))
+    |> limit(^n)
+    |> Repo.all
+  end
+
+  @doc """
   Creates a thread with the given attributes `attrs`.
 
   Returns `{:ok, %Thread{}}` if success.
