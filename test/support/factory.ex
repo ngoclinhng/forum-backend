@@ -26,15 +26,21 @@ defmodule Yojee.Factory do
     |> Repo.insert!()
   end
 
-  def insert_thread_with_posts!(num_posts) do
+  def insert_thread_with_posts!(num_posts)
+  when is_integer(num_posts) and num_posts > 0 do
     posts = for _ <- 1..num_posts, do: build(:post)
     build(:thread, posts: posts)
     |> Repo.insert!
   end
 
-  def threads_with_posts_fixture(num_threads \\ 5) do
-    0..num_threads
-    |> Enum.reverse()
+  def insert_thread_with_posts!(_num_posts) do
+    build(:thread, posts: [])
+    |> Repo.insert!
+  end
+
+  def threads_with_posts_fixture(num_threads \\ 5)
+  when is_integer(num_threads) and num_threads > 0 do
+    0..(num_threads - 1)
     |> Enum.map(&insert_thread_with_posts!/1)
   end
 end

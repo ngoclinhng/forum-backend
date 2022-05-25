@@ -1,7 +1,10 @@
 defmodule Yojee.ForumTest do
   use Yojee.DataCase, async: true
 
-  import Yojee.Factory, only: [insert!: 1]
+  import Yojee.Factory, only: [
+    insert!: 1,
+    threads_with_posts_fixture: 1
+  ]
 
   alias Yojee.Forum
   alias Yojee.Forum.{Thread, Post}
@@ -95,5 +98,111 @@ defmodule Yojee.ForumTest do
       assert %{content: ["should be at most 10000 character(s)"]} =
         errors_on(changeset)
     end
+  end
+
+  describe "list_most_popular_threads/1" do
+    setup do
+      # 4 threads ordered by the number of posts ascending (from 0 to 3)
+      threads = threads_with_posts_fixture(4)
+      {:ok, %{threads: threads}}
+    end
+
+    test "setup test", %{threads: threads} do
+      assert length(threads) === 4
+
+      threads
+      |> Enum.with_index()
+      |> Enum.each(fn {%Thread{} = t, i} ->
+        assert length(t.posts) === i
+      end)
+    end
+
+    test "lists top 1 threads", %{threads: threads} do
+      assert [_, _, _, d] = threads
+      assert [t] = Forum.list_most_popular_threads(1)
+      assert_same_thread(t, d)
+      assert t.post_count === 3
+    end
+
+    test "lists top 2 threads", %{threads: threads} do
+      assert [_, _, c, d] = threads
+      assert [t1, t2] = Forum.list_most_popular_threads(2)
+
+      assert_same_thread(t1, d)
+      assert t1.post_count === 3
+
+      assert_same_thread(t2, c)
+      assert t2.post_count === 2
+    end
+
+    test "lists top 3 threads", %{threads: threads} do
+      assert [_, b, c, d] = threads
+      assert [t1, t2, t3] = Forum.list_most_popular_threads(3)
+
+      assert_same_thread(t1, d)
+      assert t1.post_count === 3
+
+      assert_same_thread(t2, c)
+      assert t2.post_count === 2
+
+      assert_same_thread(t3, b)
+      assert t3.post_count === 1
+    end
+
+    test "lists top 4 threads", %{threads: threads} do
+      assert [a, b, c, d] = threads
+      assert [t1, t2, t3, t4] = Forum.list_most_popular_threads(4)
+
+      assert_same_thread(t1, d)
+      assert t1.post_count === 3
+
+      assert_same_thread(t2, c)
+      assert t2.post_count === 2
+
+      assert_same_thread(t3, b)
+      assert t3.post_count === 1
+
+      assert_same_thread(t4, a)
+      assert t4.post_count === 0
+    end
+
+    test "lists top 5 threads", %{threads: threads} do
+      assert [a, b, c, d] = threads
+      assert [t1, t2, t3, t4] = Forum.list_most_popular_threads(5)
+
+      assert_same_thread(t1, d)
+      assert t1.post_count === 3
+
+      assert_same_thread(t2, c)
+      assert t2.post_count === 2
+
+      assert_same_thread(t3, b)
+      assert t3.post_count === 1
+
+      assert_same_thread(t4, a)
+      assert t4.post_count === 0
+    end
+
+    test "lists top 1000 threads", %{threads: threads} do
+      assert [a, b, c, d] = threads
+      assert [t1, t2, t3, t4] = Forum.list_most_popular_threads(1000)
+
+      assert_same_thread(t1, d)
+      assert t1.post_count === 3
+
+      assert_same_thread(t2, c)
+      assert t2.post_count === 2
+
+      assert_same_thread(t3, b)
+      assert t3.post_count === 1
+
+      assert_same_thread(t4, a)
+      assert t4.post_count === 0
+    end
+  end
+
+  defp assert_same_thread(%Thread{} = t1, %Thread{} = t2) do
+    assert t1.id === t2.id
+    assert t1.title === t2.title
   end
 end
