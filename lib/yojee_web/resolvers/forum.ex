@@ -19,4 +19,18 @@ defmodule YojeeWeb.Resolvers.Forum do
         {:ok, thread}
     end
   end
+
+  def create_post(_, args, _) do
+    case Forum.create_post(args) do
+      {:error, changeset} ->
+        {
+          :error,
+          message: "Could not create post",
+          details: ChangesetErrors.error_details(changeset)
+        }
+
+      {:ok, post} ->
+        {:ok, post}
+    end
+  end
 end
