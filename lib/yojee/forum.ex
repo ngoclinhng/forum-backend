@@ -43,4 +43,14 @@ defmodule Yojee.Forum do
     |> Post.changeset(attrs)
     |> Repo.insert()
   end
+
+  # dataloader
+
+  def datasource() do
+    Dataloader.Ecto.new(Repo, query: &query/2)
+  end
+
+  def query(queryable, _) do
+    queryable
+  end
 end

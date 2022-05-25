@@ -1,9 +1,12 @@
 defmodule YojeeWeb.Schema.Schema do
   use Absinthe.Schema
 
-  # Needed for :datetime type
+  # Needed for the `:datetime` type
   import_types Absinthe.Type.Custom
 
+  import Absinthe.Resolution.Helpers, only: [dataloader: 1]
+
+  alias Yojee.Forum
   alias YojeeWeb.Resolvers
 
   # Queries
@@ -53,8 +56,24 @@ defmodule YojeeWeb.Schema.Schema do
     @desc "The (plain text) content of this post"
     field :content, non_null(:string)
 
+    @desc "The thread to which this post belongs"
+    field :thread, non_null(:thread), resolve: dataloader(Forum)
+
     field :inserted_at, non_null(:datetime)
     field :updated_at, non_null(:datetime)
   end
 
+  # Absinth execution context setup.
+
+  def context(ctx) do
+    loader =
+      Dataloader.new
+      |> Dataloader.add_source(Forum, Forum.datasource())
+
+    Map.put(ctx, :loader, loader)
+  end
+
+  def plugins do
+    [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()
+  end
 end
