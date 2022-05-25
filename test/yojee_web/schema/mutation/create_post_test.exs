@@ -6,7 +6,7 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
   alias Yojee.Utils
 
   @query """
-  mutation CreatePost($threadId: ID!, $content: String!) {
+  mutation createPost($threadId: ID!, $content: String!) {
     createPost(threadId: $threadId, content: $content) {
       content
       thread {
@@ -23,9 +23,11 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       {:ok, %{thread: thread}}
     end
 
-    test "with valid data creates post", %{thread: thread} do
+    test "with valid data creates post", ctx do
+      %{thread: thread, conn: conn} = ctx
+
       args = %{"threadId" => thread.id, "content" => "sample post"}
-      conn = create_post_request(args)
+      conn = create_post(conn, args)
 
       assert %{
         "data" => %{
@@ -40,9 +42,11 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       } === json_response(conn, 200)
     end
 
-    test "trims whitespaces on both side of content", %{thread: thread} do
+    test "trims whitespaces on both side of content", ctx do
+      %{thread: thread, conn: conn} = ctx
+
       args = %{"threadId" => thread.id, "content" => "  sample post    "}
-      conn = create_post_request(args)
+      conn = create_post(conn, args)
 
       assert %{
         "data" => %{
@@ -57,12 +61,14 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       } === json_response(conn, 200)
     end
 
-    test "creates post with max-length content", %{thread: thread} do
+    test "creates post with max-length content", ctx do
+      %{thread: thread, conn: conn} = ctx
+
       content = "a" <> Utils.random_string(9_998) <> "b"
       assert String.length(content) === 10_000
 
       args = %{"threadId" => thread.id, "content" => content}
-      conn = create_post_request(args)
+      conn = create_post(conn, args)
 
       assert %{
         "data" => %{
@@ -77,9 +83,11 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       } === json_response(conn, 200)
     end
 
-    test "fails if content is empty string", %{thread: thread} do
+    test "fails if content is empty string", ctx do
+      %{thread: thread, conn: conn} = ctx
+
       args = %{"threadId" => thread.id, "content" => "  "}
-      conn = create_post_request(args)
+      conn = create_post(conn, args)
 
       assert %{
         "data" => %{"createPost" => nil},
@@ -94,14 +102,16 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       } === json_response(conn, 200)
     end
 
-    test "fails if content is too long", %{thread: thread} do
+    test "fails if content is too long", ctx do
+      %{thread: thread, conn: conn} = ctx
+
       # We have to do this since `create_post` will trim whitespaces
       # on both sides of the input string.
       content = "a" <> Utils.random_string(9_999) <> "b"
       assert String.length(content) === 10_001
 
       args = %{"threadId" => thread.id, "content" => content}
-      conn = create_post_request(args)
+      conn = create_post(conn, args)
 
       assert %{
         "data" => %{"createPost" => nil},
@@ -119,9 +129,9 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
     end
 
     # TODO: this only works if primary key is integer.
-    test "fails if the given thread doesn't exist" do
+    test "fails if the given thread doesn't exist", %{conn: conn} do
       args = %{"threadId" => -1, "content" => "sample test"}
-      conn = create_post_request(args)
+      conn = create_post(conn, args)
 
       assert %{
         "data" => %{"createPost" => nil},
@@ -139,8 +149,8 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
 
   # Helpers
 
-  defp create_post_request(variables) do
-    build_conn()
+  defp create_post(conn, variables) do
+    conn
     |> post("/api", %{query: @query, variables: variables})
   end
 

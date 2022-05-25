@@ -17,6 +17,12 @@ defmodule YojeeWeb.Schema.Schema do
       arg :id, non_null(:id)
       resolve &Resolvers.Forum.thread/3
     end
+
+    @desc "Returns the top `count` most popular threads"
+    field :most_popular_threads, list_of(:thread) do
+      arg :count, non_null(:integer)
+      resolve &Resolvers.Forum.most_popular_threads/3
+    end
   end
 
   # Mutations
@@ -44,6 +50,9 @@ defmodule YojeeWeb.Schema.Schema do
 
     @desc "The title of this thread"
     field :title, non_null(:string)
+
+    @desc "The number of posts within this thread"
+    field :post_count, non_null(:integer)
 
     field :inserted_at, non_null(:datetime)
     field :updated_at, non_null(:datetime)

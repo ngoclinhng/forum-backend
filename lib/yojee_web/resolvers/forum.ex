@@ -6,6 +6,10 @@ defmodule YojeeWeb.Resolvers.Forum do
     {:ok, Forum.get_thread(id)}
   end
 
+  def most_popular_threads(_, %{count: count}, _) do
+    {:ok, Forum.list_most_popular_threads(count)}
+  end
+
   def create_thread(_, args, _) do
     case Forum.create_thread(args) do
       {:error, changeset} ->

@@ -4,7 +4,7 @@ defmodule YojeeWeb.Schema.Query.ThreadTest do
   import Yojee.Factory, only: [insert!: 1]
 
   @query """
-  query ($id: ID!) {
+  query getThread($id: ID!) {
     thread(id: $id) {
       id
       title
@@ -12,13 +12,10 @@ defmodule YojeeWeb.Schema.Query.ThreadTest do
   }
   """
 
-  test "thread query returns the thread with a given id" do
+  test "thread query returns the thread with a given id", %{conn: conn} do
     thread = insert!(:thread)
     variables = %{"id" => thread.id}
-
-    conn =
-      build_conn()
-      |> get("/api", query: @query, variables: variables)
+    conn = post(conn, "/api", query: @query, variables: variables)
 
     assert %{
       "data" => %{
