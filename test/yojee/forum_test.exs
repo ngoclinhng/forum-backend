@@ -31,7 +31,7 @@ defmodule Yojee.ForumTest do
     end
 
     test "requires title to have at most 140 characters long" do
-      s = String.duplicate("titl ", 28) <> "e"
+      s = random_string(141)
       assert String.length(s) === 141
       assert {:error, changeset} = Forum.create_thread(%{title: s})
       assert %{title: ["should be at most 140 character(s)"]} =
@@ -74,6 +74,25 @@ defmodule Yojee.ForumTest do
       assert %Ecto.Changeset{} = changeset
     end
 
-    test "requires post length <= 10_000 characters"
+    test "creates max-lenght post", %{thread: thread} do
+      content = random_string(10_000)
+      assert String.length(content) === 10_000
+
+      args = %{thread_id: thread.id, content: content}
+      assert {:ok, post} = Forum.create_post(args)
+      assert %Post{} = post
+      assert post.content === String.trim(content)
+      assert post.thread_id === thread.id
+    end
+
+    test "requires post length <= 10_000 characters", %{thread: thread} do
+      content = random_string(10_001)
+      assert String.length(content) === 10_001
+
+      args = %{thread_id: thread.id, content: content}
+      assert {:error, changeset} = Forum.create_post(args)
+      assert %{content: ["should be at most 10000 character(s)"]} =
+        errors_on(changeset)
+    end
   end
 end
