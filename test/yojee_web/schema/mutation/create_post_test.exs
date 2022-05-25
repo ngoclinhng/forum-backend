@@ -9,6 +9,10 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
   mutation CreatePost($threadId: ID!, $content: String!) {
     createPost(threadId: $threadId, content: $content) {
       content
+      thread {
+        id
+        title
+      }
     }
   }
   """
@@ -26,7 +30,11 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       assert %{
         "data" => %{
           "createPost" => %{
-            "content" => "sample post"
+            "content" => "sample post",
+            "thread" => %{
+              "id" => to_string(thread.id),
+              "title" => thread.title
+            }
           }
         }
       } === json_response(conn, 200)
@@ -39,7 +47,11 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       assert %{
         "data" => %{
           "createPost" => %{
-            "content" => "sample post"
+            "content" => "sample post",
+            "thread" => %{
+              "id" => to_string(thread.id),
+              "title" => thread.title
+            }
           }
         }
       } === json_response(conn, 200)
@@ -55,7 +67,11 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
       assert %{
         "data" => %{
           "createPost" => %{
-            "content" => content
+            "content" => content,
+            "thread" => %{
+              "id" => to_string(thread.id),
+              "title" => thread.title
+            }
           }
         }
       } === json_response(conn, 200)
