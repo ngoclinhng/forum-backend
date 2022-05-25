@@ -1,6 +1,9 @@
 defmodule YojeeWeb.Schema.Schema do
   use Absinthe.Schema
 
+  # Needed for :datetime type
+  import_types Absinthe.Type.Custom
+
   alias YojeeWeb.Resolvers
 
   # Queries
@@ -38,6 +41,9 @@ defmodule YojeeWeb.Schema.Schema do
 
     @desc "The title of this thread"
     field :title, non_null(:string)
+
+    field :inserted_at, non_null(:datetime)
+    field :updated_at, non_null(:datetime)
   end
 
   object :post do
@@ -46,6 +52,9 @@ defmodule YojeeWeb.Schema.Schema do
 
     @desc "The (plain text) content of this post"
     field :content, non_null(:string)
+
+    field :inserted_at, non_null(:datetime)
+    field :updated_at, non_null(:datetime)
   end
 
 end
