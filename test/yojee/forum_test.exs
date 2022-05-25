@@ -1,10 +1,10 @@
 defmodule Yojee.ForumTest do
-  use Yojee.DataCase, asyn: true
+  use Yojee.DataCase, async: true
 
   import Yojee.Factory, only: [insert!: 1]
 
   alias Yojee.Forum
-  alias Yojee.Forum.Thread
+  alias Yojee.Forum.{Thread, Post}
 
   describe "create_thread/1" do
     test "with valid data inserts thread" do
@@ -44,5 +44,36 @@ defmodule Yojee.ForumTest do
       assert %Thread{id: id, title: title} = insert!(:thread)
       assert %Thread{id: ^id, title: ^title} = Forum.get_thread(id)
     end
+  end
+
+  describe "create_post/1" do
+    setup do
+      thread = insert!(:thread)
+      {:ok, %{thread: thread}}
+    end
+
+    test "with valid data inserts post", %{thread: thread} do
+      args = %{thread_id: thread.id, content: "sample post"}
+      assert {:ok, post} = Forum.create_post(args)
+      assert %Post{} = post
+      assert post.content === "sample post"
+      assert post.thread_id === thread.id
+    end
+
+    test "trims whitespaces on both sides of post", %{thread: thread} do
+      args = %{thread_id: thread.id, content: "   sample post  "}
+      assert {:ok, post} = Forum.create_post(args)
+      assert %Post{} = post
+      assert post.content === "sample post"
+      assert post.thread_id === thread.id
+    end
+
+    test "with invalid data returns error changeset", %{thread: thread} do
+      args = %{thread_id: thread.id, content: " "}
+      assert {:error, changeset} = Forum.create_post(args)
+      assert %Ecto.Changeset{} = changeset
+    end
+
+    test "requires post length <= 10_000 characters"
   end
 end

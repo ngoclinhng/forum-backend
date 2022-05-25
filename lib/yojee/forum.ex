@@ -6,7 +6,7 @@ defmodule Yojee.Forum do
   import Ecto.Query, warn: false
   alias Yojee.Repo
 
-  alias Yojee.Forum.Thread
+  alias Yojee.Forum.{Thread, Post}
 
   @doc """
   Returns a thread whose id is given by `id`.
@@ -28,6 +28,19 @@ defmodule Yojee.Forum do
   def create_thread(attrs) do
     %Thread{}
     |> Thread.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a post with the given attributes `attrs`.
+
+  Returns `{:ok, post` if success.
+
+  Returns `{:error, changeset}`, otherwise.
+  """
+  def create_post(attrs) do
+    %Post{}
+    |> Post.changeset(attrs)
     |> Repo.insert()
   end
 end
