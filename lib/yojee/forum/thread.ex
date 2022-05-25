@@ -12,6 +12,7 @@ defmodule Yojee.Forum.Thread do
 
   schema "threads" do
     field :title, :string
+    has_many :posts, Yojee.Forum.Post
 
     timestamps()
   end
