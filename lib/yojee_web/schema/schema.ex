@@ -30,7 +30,7 @@ defmodule YojeeWeb.Schema.Schema do
     #     }
     #   }
     node field do
-      resolve &Resolvers.Node.get_node/3
+      resolve &Resolvers.Forum.get_node/3
     end
 
     @desc "Returns the top `count` most popular threads"

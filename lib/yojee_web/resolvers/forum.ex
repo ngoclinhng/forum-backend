@@ -3,9 +3,15 @@ defmodule YojeeWeb.Resolvers.Forum do
   alias YojeeWeb.Schema.ChangesetErrors
   alias YojeeWeb.Schema.Node
 
-  def thread(_, %{id: id}, _) do
+  def get_node(_parent, %{type: :thread, id: id}, _resolution) do
     {:ok, Forum.get_thread(id)}
   end
+
+  def get_node(_parent, %{type: :post, id: id}, _resolution) do
+    {:ok, Forum.get_post(id)}
+  end
+
+  def get_node(_parent, _args, _resolution), do: {:ok, nil}
 
   def most_popular_threads(_, %{count: count}, _) do
     {:ok, Forum.list_most_popular_threads(count)}
