@@ -3,7 +3,8 @@ defmodule Yojee.ForumTest do
 
   import Yojee.Factory, only: [
     insert!: 1,
-    threads_with_posts_fixture: 1
+    threads_with_posts_fixture: 1,
+    insert_thread_with_posts!: 1
   ]
 
   alias Yojee.Forum
@@ -48,7 +49,28 @@ defmodule Yojee.ForumTest do
   describe "get_thread/1" do
     test "returns the thread with the given id" do
       assert %Thread{id: id, title: title} = insert!(:thread)
-      assert %Thread{id: ^id, title: ^title} = Forum.get_thread(id)
+
+      assert %Thread{
+        id: ^id,
+        title: ^title,
+        post_count: 0
+      } = Forum.get_thread(id)
+    end
+
+    test "returns the thread along with its post_count" do
+      assert %Thread{
+        id: id,
+        title: title,
+        posts: posts
+      } = insert_thread_with_posts!(3)
+
+      assert length(posts) === 3
+
+      assert %Thread{
+        id: ^id,
+        title: ^title,
+        post_count: 3
+      } = Forum.get_thread(id)
     end
   end
 

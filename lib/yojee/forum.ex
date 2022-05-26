@@ -15,7 +15,9 @@ defmodule Yojee.Forum do
   """
   def get_thread(id) do
     Thread
-    |> Repo.get(id)
+    |> where([t], t.id == ^id)
+    |> with_post_count()
+    |> Repo.one
   end
 
   @doc """
@@ -25,9 +27,7 @@ defmodule Yojee.Forum do
   """
   def list_most_popular_threads(n) when is_integer(n) and n > 0 do
     Thread
-    |> join(:left, [t], p in assoc(t, :posts))
-    |> group_by([t, p], t.id)
-    |> select_merge([t, p], %{post_count: count(p.id)})
+    |> with_post_count()
     |> order_by([t, p], desc: count(p.id))
     |> limit(^n)
     |> Repo.all
@@ -74,5 +74,15 @@ defmodule Yojee.Forum do
 
   def query(queryable, _) do
     queryable
+  end
+
+  # Helpers
+
+  # thread with post_count
+  defp with_post_count(queryable) do
+    queryable
+    |> join(:left, [t], p in assoc(t, :posts))
+    |> group_by([t, p], t.id)
+    |> select_merge([t, p], %{post_count: count(p.id)})
   end
 end
