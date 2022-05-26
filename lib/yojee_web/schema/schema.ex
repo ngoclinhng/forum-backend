@@ -57,9 +57,16 @@ defmodule YojeeWeb.Schema.Schema do
     end
 
     @desc "Create a post with the given attributes"
-    field :create_post, :post do
-      arg :thread_id, non_null(:id)
-      arg :content, non_null(:string)
+    payload field :create_post do
+      input do
+        field :thread_id, non_null(:id)
+        field :content, non_null(:string)
+      end
+
+      output do
+        field :post, :post
+      end
+
       resolve &Resolvers.Forum.create_post/3
     end
   end

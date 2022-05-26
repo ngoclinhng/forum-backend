@@ -1,6 +1,7 @@
 defmodule YojeeWeb.Resolvers.Forum do
   alias Yojee.Forum
   alias YojeeWeb.Schema.ChangesetErrors
+  alias YojeeWeb.Schema.Node
 
   def thread(_, %{id: id}, _) do
     {:ok, Forum.get_thread(id)}
@@ -24,7 +25,20 @@ defmodule YojeeWeb.Resolvers.Forum do
     end
   end
 
-  def create_post(_, args, _) do
+  def create_post(_, %{thread_id: thread_id} = args, _) do
+    # We have to convert the global thread_id into internal id first.
+    case Node.from_global_id(thread_id) do
+      {:ok, %{type: :thread, id: id}} ->
+        create_post(%{args | thread_id: id })
+
+      _ ->
+        {:error, "Invalid thread id"}
+    end
+  end
+
+  # Helpers
+
+  def create_post(args) do
     case Forum.create_post(args) do
       {:error, changeset} ->
         {
@@ -34,7 +48,7 @@ defmodule YojeeWeb.Resolvers.Forum do
         }
 
       {:ok, post} ->
-        {:ok, post}
+        {:ok, %{post: post}}
     end
   end
 end
