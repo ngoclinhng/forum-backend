@@ -20,7 +20,7 @@ defmodule YojeeWeb.Resolvers.Forum do
         }
 
       {:ok, thread} ->
-        {:ok, thread}
+        {:ok, %{thread: thread}}
     end
   end
 

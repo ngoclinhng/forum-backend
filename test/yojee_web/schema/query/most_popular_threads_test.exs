@@ -3,6 +3,8 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
 
   import Yojee.Factory, only: [threads_with_posts_fixture: 1]
 
+  alias YojeeWeb.Schema.Node
+
   @query """
   query listMostPopularThreads($count: Int!) {
     mostPopularThreads(count: $count) {
@@ -30,7 +32,7 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       } = json_response(conn, 200)
 
       assert [
-        %{"id" => to_string(d.id), "title" => d.title, "postCount" => 3}
+        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3}
       ] === popularThreads
     end
 
@@ -45,8 +47,8 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       } = json_response(conn, 200)
 
       assert [
-        %{"id" => to_string(d.id), "title" => d.title, "postCount" => 3},
-        %{"id" => to_string(c.id), "title" => c.title, "postCount" => 2}
+        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
+        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2}
       ] === popularThreads
     end
 
@@ -61,9 +63,9 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       } = json_response(conn, 200)
 
       assert [
-        %{"id" => to_string(d.id), "title" => d.title, "postCount" => 3},
-        %{"id" => to_string(c.id), "title" => c.title, "postCount" => 2},
-        %{"id" => to_string(b.id), "title" => b.title, "postCount" => 1}
+        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
+        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
+        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1}
       ] === popularThreads
     end
 
@@ -78,10 +80,10 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       } = json_response(conn, 200)
 
       assert [
-        %{"id" => to_string(d.id), "title" => d.title, "postCount" => 3},
-        %{"id" => to_string(c.id), "title" => c.title, "postCount" => 2},
-        %{"id" => to_string(b.id), "title" => b.title, "postCount" => 1},
-        %{"id" => to_string(a.id), "title" => a.title, "postCount" => 0}
+        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
+        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
+        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1},
+        %{"id" => to_gid(a), "title" => a.title, "postCount" => 0}
       ] === popularThreads
     end
 
@@ -96,10 +98,10 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       } = json_response(conn, 200)
 
       assert [
-        %{"id" => to_string(d.id), "title" => d.title, "postCount" => 3},
-        %{"id" => to_string(c.id), "title" => c.title, "postCount" => 2},
-        %{"id" => to_string(b.id), "title" => b.title, "postCount" => 1},
-        %{"id" => to_string(a.id), "title" => a.title, "postCount" => 0}
+        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
+        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
+        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1},
+        %{"id" => to_gid(a), "title" => a.title, "postCount" => 0}
       ] === popularThreads
     end
 
@@ -114,10 +116,10 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       } = json_response(conn, 200)
 
       assert [
-        %{"id" => to_string(d.id), "title" => d.title, "postCount" => 3},
-        %{"id" => to_string(c.id), "title" => c.title, "postCount" => 2},
-        %{"id" => to_string(b.id), "title" => b.title, "postCount" => 1},
-        %{"id" => to_string(a.id), "title" => a.title, "postCount" => 0}
+        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
+        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
+        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1},
+        %{"id" => to_gid(a), "title" => a.title, "postCount" => 0}
       ] === popularThreads
     end
   end
@@ -128,5 +130,7 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
     conn
     |> post("/api", query: @query, variables: variables)
   end
+
+  defp to_gid(thread), do: Node.to_global_id(thread)
 
 end

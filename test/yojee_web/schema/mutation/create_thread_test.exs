@@ -2,10 +2,12 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
   use YojeeWeb.ConnCase, async: true
 
   @query """
-  mutation createThread($title: String!) {
-    createThread(title: $title) {
-      title
-      postCount
+  mutation createThread($input: CreateThreadInput!) {
+    createThread(input: $input) {
+      thread {
+        title
+        postCount
+      }
     }
   }
   """
@@ -16,11 +18,15 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
     assert %{
       "data" => %{
         "createThread" => %{
-          "title" => "test title",
-          "postCount" => 0
+          "thread" => ret
         }
       }
-    } === json_response(conn, 200)
+    } = json_response(conn, 200)
+
+    assert ret === %{
+      "title" => "test title",
+      "postCount" => 0
+    }
   end
 
   test "createThread mutation trims whitespaces on both side of title",
@@ -30,11 +36,15 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
     assert %{
       "data" => %{
         "createThread" => %{
-          "title" => "test title",
-          "postCount" => 0
+          "thread" => ret
         }
       }
-    } === json_response(conn, 200)
+    } = json_response(conn, 200)
+
+    assert ret === %{
+      "title" => "test title",
+      "postCount" => 0
+    }
   end
 
   test "createThread mutation fails if title < 3 characters",
@@ -80,9 +90,13 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
 
   # Helpers
 
-  defp create_thread(conn, variables) do
-    conn
-    |> post("/api", %{query: @query, variables: variables})
+  defp create_thread(conn, input) do
+    payload = %{
+      query: @query,
+      variables: %{"input" => input}
+    }
+
+    post(conn, "/api", payload)
   end
 
 end

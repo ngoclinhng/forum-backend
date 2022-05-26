@@ -42,7 +42,7 @@ defmodule YojeeWeb.Schema.Schema do
     #     }
     #   }
     node field do
-      resolve &Resolvers.Node.get_node/2
+      resolve &Resolvers.Node.get_node/3
     end
   end
 
@@ -50,8 +50,15 @@ defmodule YojeeWeb.Schema.Schema do
 
   mutation do
     @desc "Create a thread with the given attributes"
-    field :create_thread, :thread do
-      arg :title, non_null(:string)
+    payload field :create_thread do
+      input do
+        field :title, non_null(:string)
+      end
+
+      output do
+        field :thread, :thread
+      end
+
       resolve &Resolvers.Forum.create_thread/3
     end
 
