@@ -12,12 +12,7 @@ defmodule YojeeWeb.Schema.Schema do
 
   # Absinthe Relay node interface.
   node interface do
-    resolve_type fn
-      %Forum.Thread{}, _ ->
-        :thread
-      _, _ ->
-        nil
-    end
+    resolve_type &YojeeWeb.Schema.Node.type/2
   end
 
   # Queries

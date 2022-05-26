@@ -6,25 +6,33 @@ defmodule YojeeWeb.Schema.Query.ThreadTest do
     insert_thread_with_posts!: 1
   ]
 
+  alias YojeeWeb.Schema.Node
+
   @query """
   query getThread($id: ID!) {
-    thread(id: $id) {
-      id
-      title
-      postCount
+    node(id: $id) {
+      __typename
+      ... on Thread {
+        id
+        title
+        postCount
+      }
     }
   }
   """
 
   test "thread query returns the thread with a given id", %{conn: conn} do
     thread = insert!(:thread)
-    variables = %{"id" => thread.id}
+    global_id = Node.to_global_id(thread)
+
+    variables = %{"id" => global_id}
     conn = post(conn, "/api", query: @query, variables: variables)
 
     assert %{
       "data" => %{
-        "thread" => %{
-          "id" => to_string(thread.id),
+        "node" => %{
+          "__typename" => "Thread",
+          "id" => global_id,
           "title" => thread.title,
           "postCount" => 0
         }
@@ -35,13 +43,16 @@ defmodule YojeeWeb.Schema.Query.ThreadTest do
   test "thread query returns the thread along with its postCount",
     %{conn: conn} do
     thread = insert_thread_with_posts!(3)
-    variables = %{"id" => thread.id}
+    global_id = Node.to_global_id(thread)
+
+    variables = %{"id" => global_id}
     conn = post(conn, "/api", query: @query, variables: variables)
 
     assert %{
       "data" => %{
-        "thread" => %{
-          "id" => to_string(thread.id),
+        "node" => %{
+          "__typename" => "Thread",
+          "id" => global_id,
           "title" => thread.title,
           "postCount" => 3
         }
