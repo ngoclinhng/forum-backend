@@ -15,6 +15,9 @@ defmodule YojeeWeb.Schema.Schema do
     resolve_type &YojeeWeb.Schema.Node.type/2
   end
 
+  # Absinthe Relay connections.
+  connection node_type: :thread
+
   # Queries
 
   query do
@@ -37,6 +40,11 @@ defmodule YojeeWeb.Schema.Schema do
     field :most_popular_threads, list_of(:thread) do
       arg :count, non_null(:integer)
       resolve &Resolvers.Forum.most_popular_threads/3
+    end
+
+    @desc "Returns a page of threads paginated according to Relay style"
+    connection field :threads, node_type: :thread do
+      resolve &Resolvers.Forum.threads/3
     end
   end
 

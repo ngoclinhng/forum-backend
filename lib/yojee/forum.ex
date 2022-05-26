@@ -30,6 +30,15 @@ defmodule Yojee.Forum do
   end
 
   @doc """
+  Returns a list of threads ordered by ID descending.
+  """
+  def threads_query() do
+    Thread
+    |> with_post_count()
+    |> order_by(desc: :id)
+  end
+
+  @doc """
   Returns a list of `n` most popular threads, where polularity is based
   on the number of posts: the more posts a thread has the more popular
   it is.

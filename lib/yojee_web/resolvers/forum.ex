@@ -17,6 +17,11 @@ defmodule YojeeWeb.Resolvers.Forum do
     {:ok, Forum.list_most_popular_threads(count)}
   end
 
+  def threads(_, args, _) do
+    Forum.threads_query()
+    |> Absinthe.Relay.Connection.from_query(&Yojee.Repo.all/1, args)
+  end
+
   def create_thread(_, args, _) do
     case Forum.create_thread(args) do
       {:error, changeset} ->
