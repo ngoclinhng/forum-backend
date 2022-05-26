@@ -43,7 +43,8 @@ defmodule Yojee.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:absinthe, "~> 1.5"},
       {:absinthe_plug, "~> 1.5"},
-      {:dataloader, "~> 1.0.0"}
+      {:dataloader, "~> 1.0.0"},
+      {:absinthe_relay, "~> 1.5.0"}
     ]
   end
 
