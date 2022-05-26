@@ -18,18 +18,6 @@ defmodule YojeeWeb.Schema.Schema do
   # Queries
 
   query do
-    @desc "Get the thread whose id is given by id"
-    field :thread, :thread do
-      arg :id, non_null(:id)
-      resolve &Resolvers.Forum.thread/3
-    end
-
-    @desc "Returns the top `count` most popular threads"
-    field :most_popular_threads, list_of(:thread) do
-      arg :count, non_null(:integer)
-      resolve &Resolvers.Forum.most_popular_threads/3
-    end
-
     # This will provide a unified interface to query for any object that
     # conforms to the node interface. For example, this is how we query
     # for a thread object:
@@ -43,6 +31,12 @@ defmodule YojeeWeb.Schema.Schema do
     #   }
     node field do
       resolve &Resolvers.Node.get_node/3
+    end
+
+    @desc "Returns the top `count` most popular threads"
+    field :most_popular_threads, list_of(:thread) do
+      arg :count, non_null(:integer)
+      resolve &Resolvers.Forum.most_popular_threads/3
     end
   end
 
