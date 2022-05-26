@@ -5,6 +5,7 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
   mutation createThread($title: String!) {
     createThread(title: $title) {
       title
+      postCount
     }
   }
   """
@@ -15,7 +16,8 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
     assert %{
       "data" => %{
         "createThread" => %{
-          "title" => "test title"
+          "title" => "test title",
+          "postCount" => 0
         }
       }
     } === json_response(conn, 200)
@@ -28,7 +30,8 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
     assert %{
       "data" => %{
         "createThread" => %{
-          "title" => "test title"
+          "title" => "test title",
+          "postCount" => 0
         }
       }
     } === json_response(conn, 200)

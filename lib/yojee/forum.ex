@@ -44,6 +44,13 @@ defmodule Yojee.Forum do
     %Thread{}
     |> Thread.changeset(attrs)
     |> Repo.insert()
+    |> case do
+         {:ok, thread} ->
+           {:ok, struct!(thread, post_count: 0)}
+
+         {:error, changeset} ->
+           {:error, changeset}
+       end
   end
 
   @doc """

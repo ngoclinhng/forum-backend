@@ -15,6 +15,7 @@ defmodule Yojee.ForumTest do
       assert {:ok, thread} = Forum.create_thread(%{title: "Test title"})
       assert %Thread{} = thread
       assert thread.title === "Test title"
+      assert thread.post_count === 0
     end
 
     test "with invalid data returns error changeset" do
@@ -26,6 +27,7 @@ defmodule Yojee.ForumTest do
       assert {:ok, thread} = Forum.create_thread(%{title: "  Test title "})
       assert %Thread{} = thread
       assert thread.title === "Test title"
+      assert thread.post_count === 0
     end
 
     test "requires title to have at least 3 characters long" do
