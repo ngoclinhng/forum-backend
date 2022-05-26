@@ -114,10 +114,7 @@ defmodule YojeeWeb.Schema.Schema do
     field :updated_at, non_null(:datetime)
   end
 
-  object :post do
-    @desc "The unique identifier of this post"
-    field :id, non_null(:id)
-
+  node object :post do
     @desc "The (plain text) content of this post"
     field :content, non_null(:string)
 

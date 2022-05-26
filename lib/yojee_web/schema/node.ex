@@ -1,5 +1,5 @@
 defmodule YojeeWeb.Schema.Node do
-  alias Yojee.Forum.Thread
+  alias Yojee.Forum.{Thread, Post}
   alias Absinthe.Relay.Node
   alias YojeeWeb.Schema.Schema
 
@@ -7,6 +7,7 @@ defmodule YojeeWeb.Schema.Node do
   Type resolver for Absinthe Relay node interface.
   """
   def type(%Thread{}, _absinthe_resolution), do: :thread
+  def type(%Post{}, _absinthe_resolution), do: :post
   def type(_struct, _absinthe_resolution), do: nil
 
   @doc """
@@ -14,6 +15,9 @@ defmodule YojeeWeb.Schema.Node do
   """
   def to_global_id(%Thread{id: internal_id}) do
     Node.to_global_id(:thread, internal_id, Schema)
+  end
+  def to_global_id(%Post{id: internal_id}) do
+    Node.to_global_id(:post, internal_id, Schema)
   end
 
   @doc """

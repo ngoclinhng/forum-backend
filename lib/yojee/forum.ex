@@ -21,6 +21,15 @@ defmodule Yojee.Forum do
   end
 
   @doc """
+  Returns a post whose id is given by `id`.
+
+  Returns `nil` if no such post exists.
+  """
+  def get_post(id) do
+    Repo.get(Post, id)
+  end
+
+  @doc """
   Returns a list of `n` most popular threads, where polularity is based
   on the number of posts: the more posts a thread has the more popular
   it is.
