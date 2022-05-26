@@ -17,6 +17,7 @@ defmodule YojeeWeb.Schema.Schema do
 
   # Absinthe Relay connections.
   connection node_type: :thread
+  connection node_type: :post
 
   # Queries
 
@@ -118,6 +119,11 @@ defmodule YojeeWeb.Schema.Schema do
 
     @desc "The number of posts within this thread"
     field :post_count, non_null(:integer)
+
+    @desc "a page of posts paginated according to Relay style"
+    connection field :posts, node_type: :post do
+      resolve &Resolvers.Forum.posts/3
+    end
 
     field :inserted_at, non_null(:datetime)
     field :updated_at, non_null(:datetime)

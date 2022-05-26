@@ -141,6 +141,8 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
     end)
   end
 
+  # Helpers
+
   defp convert_to_node(%{title: title, posts: posts} = thread) do
     %{
       "node" => %{

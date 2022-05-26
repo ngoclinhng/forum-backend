@@ -22,6 +22,11 @@ defmodule YojeeWeb.Resolvers.Forum do
     |> Absinthe.Relay.Connection.from_query(&Yojee.Repo.all/1, args)
   end
 
+  def posts(_, args, %{source: thread}) do
+    Forum.posts_query(thread)
+    |> Absinthe.Relay.Connection.from_query(&Yojee.Repo.all/1, args)
+  end
+
   def create_thread(_, args, _) do
     case Forum.create_thread(args) do
       {:error, changeset} ->
