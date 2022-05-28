@@ -8,7 +8,12 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
   alias YojeeWeb.Schema.Node
 
   @query """
-  query ListThread($after: String, $before: String, $first: Int, $last: Int) {
+  query ListThread(
+    $after: String,
+    $before: String,
+    $first: Int,
+    $last: Int
+  ) {
     threads(after: $after, before: $before, first: $first, last: $last) {
       edges {
         node {
@@ -16,11 +21,11 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
           title
           postCount
         }
-        cursor
       }
       pageInfo {
         hasNextPage
         hasPreviousPage
+        endCursor
       }
     }
   }
@@ -58,7 +63,7 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
           }
         } = json_response(conn, 200)
 
-        assert remove_cursor(edges) == Enum.take(threads, first)
+        assert edges == Enum.take(threads, first)
       end
     end)
 
@@ -91,7 +96,7 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
           }
         } = json_response(conn, 200)
 
-        assert remove_cursor(edges) == Enum.take(tail, first)
+        assert edges == Enum.take(tail, first)
       end
     end)
 
@@ -136,7 +141,7 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
           |> Enum.take(last)
           |> Enum.reverse()
 
-        assert remove_cursor(edges) == expected
+        assert edges == expected
       end
     end)
   end
@@ -153,24 +158,18 @@ defmodule YojeeWeb.Schema.Query.ThreadsTest do
     }
   end
 
-  defp remove_cursor(edges) do
-    edges
-    |> Enum.map(&(Map.delete(&1, "cursor")))
-  end
-
   defp cursor_at(conn, index) when is_integer(index) and index > 0 do
     variables = %{"first" => index}
     conn = post(conn, "/api", query: @query, variables: variables)
 
     %{
       "data" => %{
-        "threads" => %{"edges" => edges}
+        "threads" => %{"pageInfo" => pageInfo}
       }
     } = json_response(conn, 200)
 
-    edges
-    |> List.last()
-    |> Map.fetch!("cursor")
+    pageInfo
+    |> Map.fetch!("endCursor")
   end
 
 end

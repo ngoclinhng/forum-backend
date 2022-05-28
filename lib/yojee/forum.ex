@@ -30,23 +30,19 @@ defmodule Yojee.Forum do
   end
 
   @doc """
-  Returns an `Ecto.Query` to get a list of threads ordered by ID
-  descending.
+  Returns an `Ecto.Query` to get a list of threads.
   """
   def threads_query() do
     Thread
     |> with_post_count()
-    |> order_by(desc: :id)
   end
 
   @doc """
-  Returns an `Ecto.Query` to get a list of posts ordered by ID
-  descending within the given `thread`.
+  Returns an `Ecto.Query` to get a list of posts.
   """
   def posts_query(%Thread{id: thread_id}) do
     Post
     |> where([p], p.thread_id == ^thread_id)
-    |> order_by(desc: :id)
   end
 
   @doc """

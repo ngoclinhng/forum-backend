@@ -2,6 +2,7 @@ defmodule YojeeWeb.Resolvers.Forum do
   alias Yojee.Forum
   alias YojeeWeb.Schema.ChangesetErrors
   alias YojeeWeb.Schema.Node
+  alias YojeeWeb.Resolvers.Connection
 
   def get_node(_parent, %{type: :thread, id: id}, _resolution) do
     {:ok, Forum.get_thread(id)}
@@ -19,12 +20,12 @@ defmodule YojeeWeb.Resolvers.Forum do
 
   def threads(_, args, _) do
     Forum.threads_query()
-    |> Absinthe.Relay.Connection.from_query(&Yojee.Repo.all/1, args)
+    |> Connection.from_query(&Yojee.Repo.all/1, args, id: :desc)
   end
 
   def posts(_, args, %{source: thread}) do
     Forum.posts_query(thread)
-    |> Absinthe.Relay.Connection.from_query(&Yojee.Repo.all/1, args)
+    |> Connection.from_query(&Yojee.Repo.all/1, args, id: :desc)
   end
 
   def create_thread(_, args, _) do

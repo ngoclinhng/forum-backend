@@ -26,11 +26,11 @@ defmodule YojeeWeb.Schema.Query.PostsTest do
               id
               content
             }
-            cursor
           }
           pageInfo {
             hasNextPage
             hasPreviousPage
+            endCursor
           }
         }
       }
@@ -204,14 +204,13 @@ defmodule YojeeWeb.Schema.Query.PostsTest do
     %{
       "data" => %{
         "node" => %{
-          "posts" => %{"edges" => edges}
+          "posts" => %{"pageInfo" => pageInfo}
         }
       }
     } = json_response(conn, 200)
 
-    edges
-    |> List.last()
-    |> Map.fetch!("cursor")
+    pageInfo
+    |> Map.fetch!("endCursor")
   end
 
 end
