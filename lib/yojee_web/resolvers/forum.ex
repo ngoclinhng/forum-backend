@@ -16,7 +16,7 @@ defmodule YojeeWeb.Resolvers.Forum do
   def get_node(_parent, _args, _resolution), do: {:ok, nil}
 
   def most_popular_threads(_, %{count: count}, _) do
-    {:ok, Forum.list_most_popular_threads(count)}
+    {:ok, ForumBridge.list_popular_threads(count)}
   end
 
   def threads(_, args, _) do

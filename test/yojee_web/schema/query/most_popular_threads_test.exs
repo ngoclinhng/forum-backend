@@ -1,7 +1,5 @@
 defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
-  use YojeeWeb.ConnCase, async: true
-
-  import Yojee.Factory, only: [threads_with_posts_fixture: 1]
+  use YojeeWeb.ConnCase, async: false
 
   alias YojeeWeb.Schema.Node
 
@@ -15,122 +13,69 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
   }
   """
 
+  @cache_size Application.fetch_env!(:yojee, :thread_cache_size)
+  @thread_count 6
+
   describe "mostPopularThreads query" do
     setup do
-      threads = threads_with_posts_fixture(4)
+      start_supervised!(Yojee.ThreadCache)
+
+      threads =
+        1..@thread_count
+        |> Enum.map(&create_thread_with_posts/1)
+        |> Enum.reverse
+        |> Enum.map(&to_json/1)
+
       {:ok, %{threads: threads}}
     end
 
-    test "requests top 1 threads", %{threads: threads, conn: conn} do
-      [_, _, _, d] = threads
-      conn = list_most_popular_threads(conn, 1)
+    1..@cache_size
+    |> Enum.each(fn count ->
+      test "lists top #{count} threads", %{threads: threads, conn: conn} do
+        count = unquote(count)
+        expected = Enum.take(threads, count)
 
-      assert %{
-        "data" => %{
-          "mostPopularThreads" => popularThreads
-        }
-      } = json_response(conn, 200)
+        conn = list_popular_threads(conn, count)
 
-      assert [
-        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3}
-      ] === popularThreads
-    end
+        assert %{
+          "data" => %{
+            "mostPopularThreads" => results
+          }
+        } = json_response(conn, 200)
 
-    test "requests top 2 threads", %{threads: threads, conn: conn} do
-      [_, _, c, d] = threads
-      conn = list_most_popular_threads(conn, 2)
-
-      assert %{
-        "data" => %{
-          "mostPopularThreads" => popularThreads
-        }
-      } = json_response(conn, 200)
-
-      assert [
-        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
-        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2}
-      ] === popularThreads
-    end
-
-    test "requests top 3 threads", %{threads: threads, conn: conn} do
-      [_, b, c, d] = threads
-      conn = list_most_popular_threads(conn, 3)
-
-      assert %{
-        "data" => %{
-          "mostPopularThreads" => popularThreads
-        }
-      } = json_response(conn, 200)
-
-      assert [
-        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
-        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
-        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1}
-      ] === popularThreads
-    end
-
-    test "requests top 4 threads", %{threads: threads, conn: conn} do
-      [a, b, c, d] = threads
-      conn = list_most_popular_threads(conn, 4)
-
-      assert %{
-        "data" => %{
-          "mostPopularThreads" => popularThreads
-        }
-      } = json_response(conn, 200)
-
-      assert [
-        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
-        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
-        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1},
-        %{"id" => to_gid(a), "title" => a.title, "postCount" => 0}
-      ] === popularThreads
-    end
-
-    test "requests top 5 threads", %{threads: threads, conn: conn} do
-      [a, b, c, d] = threads
-      conn = list_most_popular_threads(conn, 5)
-
-      assert %{
-        "data" => %{
-          "mostPopularThreads" => popularThreads
-        }
-      } = json_response(conn, 200)
-
-      assert [
-        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
-        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
-        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1},
-        %{"id" => to_gid(a), "title" => a.title, "postCount" => 0}
-      ] === popularThreads
-    end
-
-    test "requests top 1000 threads", %{threads: threads, conn: conn} do
-      [a, b, c, d] = threads
-      conn = list_most_popular_threads(conn, 1000)
-
-      assert %{
-        "data" => %{
-          "mostPopularThreads" => popularThreads
-        }
-      } = json_response(conn, 200)
-
-      assert [
-        %{"id" => to_gid(d), "title" => d.title, "postCount" => 3},
-        %{"id" => to_gid(c), "title" => c.title, "postCount" => 2},
-        %{"id" => to_gid(b), "title" => b.title, "postCount" => 1},
-        %{"id" => to_gid(a), "title" => a.title, "postCount" => 0}
-      ] === popularThreads
-    end
+        assert results === expected
+      end
+    end)
   end
 
-  defp list_most_popular_threads(conn, count) do
+  # Helpers
+
+  defp list_popular_threads(conn, count) do
     variables = %{"count" => count}
 
     conn
     |> post("/api", query: @query, variables: variables)
   end
 
-  defp to_gid(thread), do: Node.to_global_id(thread)
+  defp to_json(%{title: title, post_count: post_count} = t) do
+    %{
+      "id" => Node.to_global_id(t),
+      "title" => title,
+      "postCount" => post_count
+    }
+  end
 
+  defp create_thread_with_posts(post_count) do
+    title = "thread-#{System.unique_integer([:positive])}"
+    {:ok, t} = Yojee.ForumBridge.create_thread(%{title: title})
+
+    1..post_count
+    |> Enum.each(fn _ ->
+      content = "post-#{System.unique_integer([:positive])}"
+      args = %{thread_id: t.id, content: content}
+      {:ok, _} = Yojee.ForumBridge.create_post(args)
+    end)
+
+    struct(t, post_count: post_count)
+  end
 end
