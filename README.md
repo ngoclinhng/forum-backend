@@ -16,4 +16,8 @@ Now you can visit [`http://localhost:4000/graphiql`](http://localhost:4000/graph
 ## The Data Model:
 
 The Data Model has two entities: Thread and Post. They are stored in the
-PostgreSQL database.
+PostgreSQL database under tables `threads` and `posts`, respectively.
+
+## Ecto Schemas
+
+We have corresponding Ecto Schemas map to each of thoes database tables.
