@@ -88,12 +88,12 @@ advertises itself to support cursor-based pagination, it actually uses the
 combination of `LIMIT` and `OFFSET` to fetch data under the hood. This style
 of pagination has the following drawbacks:
 
-  - Users would end of with duplicate data or even worse, lost data while
+  - Users would end up with duplicate data or even worse, lost data while
     navigating through pages.
 
   - The time complexity to fetch data is linear (in terms of `OFFSET`). This
     is unaffordable when the number of items (threads/posts) is large.
 
-To overcome the shortcomings of `absinthe_relay`, we implemented a [custom connection](lib/yojee_web/resolvers/connection.ex). It uses the encoded id as the
+To overcome the shortcomings of `absinthe_relay`, we implemented a [custom connection](lib/yojee_web/resolvers/connection.ex). It uses the (encoded) id as the
 cursor and fetches data using the combination of `WHERE`, `ORDER_BY` and
-`LIMIT` (e.g., `WHERE id > 10 ORDER BY id DESC LIMIT 5`).
+`LIMIT` clauses (e.g., `WHERE id > 10 ORDER BY id DESC LIMIT 5`).
