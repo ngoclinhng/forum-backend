@@ -1,5 +1,5 @@
 defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
-  use YojeeWeb.ConnCase, async: true
+  use YojeeWeb.ConnCase, async: false
 
   @query """
   mutation createThread($input: CreateThreadInput!) {
@@ -11,6 +11,11 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
     }
   }
   """
+
+  setup do
+    start_supervised!(Yojee.ThreadCache)
+    :ok
+  end
 
   test "createThread mutation creates a thread", %{conn: conn} do
     conn = create_thread(conn, %{title: "test title"})

@@ -1,5 +1,6 @@
 defmodule YojeeWeb.Resolvers.Forum do
   alias Yojee.Forum
+  alias Yojee.ForumBridge
   alias YojeeWeb.Schema.ChangesetErrors
   alias YojeeWeb.Schema.Node
   alias YojeeWeb.Resolvers.Connection
@@ -29,7 +30,7 @@ defmodule YojeeWeb.Resolvers.Forum do
   end
 
   def create_thread(_, args, _) do
-    case Forum.create_thread(args) do
+    case ForumBridge.create_thread(args) do
       {:error, changeset} ->
         {
           :error,
