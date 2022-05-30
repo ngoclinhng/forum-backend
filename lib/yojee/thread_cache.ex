@@ -39,12 +39,7 @@ defmodule Yojee.ThreadCache do
   It seems like silly to pay such an expensive cost for each post
   insert/remove operation, but:
 
-    1. The process of updating the server state happens in the background
-       asynchronously, so we don't make our users wait: when a user creates
-       a post, he'll get it immediately (without having to wait for the
-       update process to finish).
-
-    2. In the real world application where the number of threads is large,
+    1. In the real world application where the number of threads is large,
        the probability of users interacting with old threads are low
        (given that we present them from newest to oldest threads), so by
        inreasing the cache size (if you were to ask me to show 10 most
@@ -83,10 +78,11 @@ defmodule Yojee.ThreadCache do
   would probably have changed the `post_count` of the thread whose id is
   given by `thread_id`.
 
-  Note that this is an asynchronous call.
+  Note that this MUST BE synchronous call, otherwise we would run into
+  nasty race condition!
   """
   def update_cache(event, thread_id) when event in @events do
-    GenServer.cast(__MODULE__, {:update_cache, event, thread_id})
+    GenServer.call(__MODULE__, {:update_cache, event, thread_id})
   end
 
   # Server Callbacks
@@ -109,27 +105,27 @@ defmodule Yojee.ThreadCache do
   end
 
   @impl true
-  def handle_cast({:update_cache, :post_added, thread_id}, state) do
+  def handle_call({:update_cache, :post_added, thread_id}, _f, state) do
     new_state = state_increment(state, thread_id)
-    {:noreply, new_state}
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_cast({:update_cache, :post_removed, thread_id}, state) do
+  def handle_call({:update_cache, :post_removed, thread_id}, _f, state) do
     new_state = state_decrement(state, thread_id)
-    {:noreply, new_state}
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_cast({:update_cache, :thread_added, thread_id}, state) do
+  def handle_call({:update_cache, :thread_added, thread_id}, _f, state) do
     new_state = state_append(state, {thread_id, 0})
-    {:noreply, new_state}
+    {:reply, :ok, new_state}
   end
 
   @impl true
-  def handle_cast({:update_cache, :thread_removed, thread_id}, state) do
+  def handle_call({:update_cache, :thread_removed, thread_id}, _f, state) do
     new_state = state_remove(state, thread_id)
-    {:noreply, new_state}
+    {:reply, :ok, new_state}
   end
 
   # Helpers
@@ -179,8 +175,7 @@ defmodule Yojee.ThreadCache do
   defp state_insert(state, nil), do: state
   defp state_insert(state, %{id: id, post_count: post_count}) do
     [{id, post_count} | state]
-    |> List.keysort(1)
-    |> Enum.reverse()
+    |> state_sort()
     |> Enum.take(@cache_size)
   end
 
@@ -202,5 +197,12 @@ defmodule Yojee.ThreadCache do
       {k, v} ->
         {k, v}
     end)
+    |> state_sort()
+  end
+
+  defp state_sort(state) do
+    state
+    |> List.keysort(1)
+    |> Enum.reverse()
   end
 end

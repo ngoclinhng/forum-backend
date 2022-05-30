@@ -46,8 +46,15 @@ defmodule Yojee.Application do
   end
 
   defp children_list(_use_thread_cache = true) do
-    children_list(false)
-    |> Kernel.++([Yojee.ThreadCache])
+    # We manually start our cache server for each test
+    case Mix.env() do
+      :test ->
+        children_list(false)
+
+      _ ->
+        children_list(false)
+        |> Kernel.++([Yojee.ThreadCache])
+    end
   end
 
 end
