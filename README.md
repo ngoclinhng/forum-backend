@@ -41,4 +41,4 @@ data.
 
 ### Pagination
 
-[lib/yojee_web/resolvers/connection.ex](custom connection)
+[custom connection](lib/yojee_web/resolvers/connection.ex)
