@@ -36,3 +36,9 @@ The queries and mutations documents supported by the API are defined in the
 graphQL Schema. To execute thoes documents, we have a thin layer of Resolver
 modules that lean on the Phoenix context modules to fetch, create and update
 data.
+
+## The details
+
+### Pagination
+
+[./lib/yojee_web/resolvers/connection.ex](custom connection)
