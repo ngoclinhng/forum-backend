@@ -47,3 +47,8 @@ config :logger, level: :info
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
+
+# Thread cache config
+config :yojee,
+  use_thread_cache: true,
+  thread_cache_size: 10

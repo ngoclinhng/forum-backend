@@ -59,6 +59,17 @@ defmodule Yojee.Forum do
   end
 
   @doc """
+  """
+  def list_threads([]), do: []
+  def list_threads(thread_ids) do
+    Thread
+    |> where([t], t.id in ^thread_ids)
+    |> with_post_count()
+    |> order_by([t, p], desc: count(p.id))
+    |> Repo.all
+  end
+
+  @doc """
   Creates a thread with the given attributes `attrs`.
 
   Returns `{:ok, %Thread{}}` if success.

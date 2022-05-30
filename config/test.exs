@@ -25,3 +25,8 @@ config :logger, level: :warn
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Thread cache config
+config :yojee,
+  use_thread_cache: true,
+  thread_cache_size: 3

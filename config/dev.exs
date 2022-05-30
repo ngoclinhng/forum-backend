@@ -64,3 +64,8 @@ config :cors_plug,
   origin: ["http://localhost:3000"],
   max_age: 86400,
   methods: ["GET", "POST"]
+
+# Thread cache config
+config :yojee,
+  use_thread_cache: true,
+  thread_cache_size: 10
