@@ -74,12 +74,12 @@ The third option is to somehow cache the IDs of top N popular threads in
 memory. This guarantees to be fast, but at a cost: we have to make sure
 our cache correctly reflects the state of the database at any moment in time.
 
-We implement both options 2 and 3 with the help of a [cache server](lib/yojee/thread_cache.ex), a [bridge module](lib/yojee/forum_bridge.ex), and a few [environment variables](https://github.com/ngoclinhng/forum-backend/blob/306269874f25fa2d3dd0b07b2489bde0c66905d8/config/test.exs#L31).
+We implemented both options 2 and 3 with the help of a [cache server](lib/yojee/thread_cache.ex), a [bridge module](lib/yojee/forum_bridge.ex), and a few [environment variables](https://github.com/ngoclinhng/forum-backend/blob/306269874f25fa2d3dd0b07b2489bde0c66905d8/config/test.exs#L31).
 
 ### Pagination
 
 To allow our React client to paginate through a long list of threads and
-posts, we implement cursor-based pagination based on [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+posts, we implemented cursor-based pagination based on [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
 
 Even though [absinthe_relay](https://hexdocs.pm/absinthe_relay/readme.html)
 advertises itself to support cursor-based pagination, it actually uses the
@@ -92,6 +92,6 @@ of pagination has the following drawbacks:
   - The time complexity to fetch data is linear (in terms of `OFFSET`). This
     is unaffordable when the number of items (threads/posts) is large.
 
-To overcome the shortcomings of `absinthe_relay`, we implement a [custom connection](lib/yojee_web/resolvers/connection.ex). It uses the encoded id as the
+To overcome the shortcomings of `absinthe_relay`, we implemented a [custom connection](lib/yojee_web/resolvers/connection.ex). It uses the encoded id as the
 cursor and fetches data using the combination of `WHERE`, `ORDER_BY` and
 `LIMIT` (e.g., `WHERE id > 10 ORDER BY id DESC LIMIT 5`).
