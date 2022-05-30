@@ -39,6 +39,18 @@ data.
 
 ## The details
 
+### Most popular threads.
+
+```elixir
+def list_popular_threads(n) when is_integer(n) and n > 0 do
+  Thread
+  |> with_post_count()
+  |> order_by([t, p], desc: count(p.id))
+  |> limit(^n)
+  |> Repo.all
+end
+```
+
 ### Pagination
 
 To allow our React client to paginate through a long list of threads and
@@ -57,4 +69,4 @@ of pagination has the following drawbacks:
 
 To overcome the shortcomings of `absinthe_relay`, we implement a [custom connection](lib/yojee_web/resolvers/connection.ex). It uses the encoded id as the
 cursor and fetches data using the combination of `WHERE`, `ORDER_BY` and
-`LIMIT` (e.g., `WHERE id > 10 ORDER BY id LIMIT 5`).
+`LIMIT` (e.g., `WHERE id > 10 ORDER BY id DESC LIMIT 5`).
