@@ -1,5 +1,5 @@
 defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
-  use YojeeWeb.ConnCase, async: true
+  use YojeeWeb.ConnCase, async: false
 
   import Yojee.Factory, only: [insert!: 1]
 
@@ -22,6 +22,7 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
 
   describe "createPost mutation" do
     setup do
+      start_supervised!(Yojee.ThreadCache)
       thread = insert!(:thread)
       {:ok, %{thread: thread}}
     end

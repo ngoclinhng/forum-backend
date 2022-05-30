@@ -57,7 +57,7 @@ defmodule YojeeWeb.Resolvers.Forum do
   # Helpers
 
   def create_post(args) do
-    case Forum.create_post(args) do
+    case ForumBridge.create_post(args) do
       {:error, changeset} ->
         {
           :error,
