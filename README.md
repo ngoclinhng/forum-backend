@@ -70,6 +70,10 @@ def list_popular_threads(n) when is_integer(n) and n > 0 do
 end
 ```
 
+The third option is to somehow cache the IDs of top N popular threads in
+memory. This guarantees to be fast, but at a cost: we have to make sure
+our cache correctly reflects the state of the database at any moment in time.
+
 ### Pagination
 
 To allow our React client to paginate through a long list of threads and
