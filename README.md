@@ -1,5 +1,7 @@
 # Forum GraphQL Server
 
+[launch graphiql on Heroku](https://intense-tor-69986.herokuapp.com/graphiql)
+
 To start the server:
 
   * Install dependencies with `mix deps.get`
