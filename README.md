@@ -74,7 +74,7 @@ The third option is to somehow cache the IDs of top N popular threads in
 memory. This guarantees to be fast, but at a cost: we have to make sure
 our cache correctly reflects the state of the database at any moment in time.
 
-We implement both options 2 and 3 with the help of [lib/yojee/thread_cache.ex](cache), [bridge](lib/yojee/forum_bridge.ex), and a [few environment veriables](https://github.com/ngoclinhng/forum-backend/blob/306269874f25fa2d3dd0b07b2489bde0c66905d8/config/test.exs#L31).
+We implement both options 2 and 3 with the help of a [cache server](lib/yojee/thread_cache.ex), a [bridge module](lib/yojee/forum_bridge.ex), and a few [environment variables](https://github.com/ngoclinhng/forum-backend/blob/306269874f25fa2d3dd0b07b2489bde0c66905d8/config/test.exs#L31).
 
 ### Pagination
 
