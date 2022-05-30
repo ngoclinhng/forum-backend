@@ -9,10 +9,6 @@ To start the server:
 Now you can visit [`http://localhost:4000/graphiql`](http://localhost:4000/graphiql) from your browser.
 
 
-## Learn more
+## The big picture
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+  ![App design](app_overview.png)
