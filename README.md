@@ -13,7 +13,7 @@ Now you can visit [`http://localhost:4000/graphiql`](http://localhost:4000/graph
 
   ![App design](app_overview.png)
 
-### The Data Model:
+## The Data Model:
 
 The Data Model has two entities: Thread and Post. They are stored in the
 PostgreSQL database.
