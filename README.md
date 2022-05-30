@@ -56,7 +56,9 @@ integer); this also causes nasty race condition:
   - So when both A and B finish, the `post_count` of X would be `1` intead of
     `2`.
 
-The second option is:
+The second option is to join the threads table with the posts table, group
+them by thread id, and count the number of posts for each groups. This
+solution works, but it does not scale well:
 
 ```elixir
 def list_popular_threads(n) when is_integer(n) and n > 0 do
