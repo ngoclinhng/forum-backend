@@ -41,6 +41,23 @@ data.
 
 ### Most popular threads.
 
+The first straightforward option is to add an additional column named
+`post_count` to the `threads` table. Whenever clients ask for the top N
+threads, all we have to do is to sort the threads in descending order of
+their post count and return the top N. Not only does this add an extra
+`4 bytes` to each and every thread row (given the type of `post_count` is
+integer); this also causes nasty race condition:
+
+  - Thread X has no posts yet, so its `post_count` is `0`.
+
+  - Client A and B insert a post to X **at the exact same time**. By the
+    nature of database transaction, both A and B see `0` as X's `post_count`.
+
+  - So when both A and B finish, the `post_count` of X would be `1` intead of
+    `2`.
+
+The second option is:
+
 ```elixir
 def list_popular_threads(n) when is_integer(n) and n > 0 do
   Thread
