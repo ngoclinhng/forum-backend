@@ -22,7 +22,7 @@ defmodule YojeeWeb.Schema.Mutation.CreatePostTest do
 
   describe "createPost mutation" do
     setup do
-      start_supervised!(Yojee.ThreadCache)
+      start_cache_server()
       thread = insert!(:thread)
       {:ok, %{thread: thread}}
     end

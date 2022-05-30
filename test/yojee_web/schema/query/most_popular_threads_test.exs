@@ -13,12 +13,12 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
   }
   """
 
-  @cache_size Application.fetch_env!(:yojee, :thread_cache_size)
+  @p_thread_count Application.fetch_env!(:yojee, :popular_thread_count)
   @thread_count 6
 
   describe "mostPopularThreads query" do
     setup do
-      start_supervised!(Yojee.ThreadCache)
+      start_cache_server()
 
       threads =
         1..@thread_count
@@ -29,7 +29,7 @@ defmodule YojeeWeb.Schema.Query.MostPopularThreadsTest do
       {:ok, %{threads: threads}}
     end
 
-    1..@cache_size
+    1..@p_thread_count
     |> Enum.each(fn count ->
       test "lists top #{count} threads", %{threads: threads, conn: conn} do
         count = unquote(count)

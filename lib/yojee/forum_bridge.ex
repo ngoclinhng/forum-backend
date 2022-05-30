@@ -27,7 +27,7 @@ defmodule Yojee.ForumBridge do
   See `Forum.list_most_popular_threads/1`.
   """
   def list_popular_threads(count) when is_integer(count) and count > 0 do
-    ThreadCache.popular_threads(count)
+    list_popular_threads(count, @use_cache)
   end
 
   # Helpers
@@ -60,6 +60,14 @@ defmodule Yojee.ForumBridge do
          {:error, changeset} ->
            {:error, changeset}
        end
+  end
+
+  defp list_popular_threads(count, _use_thread_cache = false) do
+    Forum.list_most_popular_threads(count)
+  end
+
+  defp list_popular_threads(count, _use_thread_cache = true) do
+    ThreadCache.popular_threads(count)
   end
 
 end

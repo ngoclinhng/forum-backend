@@ -52,7 +52,7 @@ defmodule Yojee.ThreadCache do
 
   alias Yojee.Forum
 
-  @cache_size Application.fetch_env!(:yojee, :thread_cache_size)
+  @cache_size Application.fetch_env!(:yojee, :popular_thread_count) * 10
 
   @events [:post_added, :post_removed, :thread_added, :thread_removed]
 

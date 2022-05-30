@@ -68,4 +68,4 @@ config :cors_plug,
 # Thread cache config
 config :yojee,
   use_thread_cache: true,
-  thread_cache_size: 10
+  popular_thread_count: 10

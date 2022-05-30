@@ -55,4 +55,19 @@ defmodule Yojee.DataCase do
       end)
     end)
   end
+
+  def start_cache_server() do
+    case Application.fetch_env!(:yojee, :use_thread_cache) do
+      true ->
+        start_supervised!(Yojee.ThreadCache)
+      false ->
+        nil
+    end
+  end
+
+  def assert_cache_state_is(state) do
+    if Application.fetch_env!(:yojee, :use_thread_cache) do
+      assert :sys.get_state(Yojee.ThreadCache) === state
+    end
+  end
 end

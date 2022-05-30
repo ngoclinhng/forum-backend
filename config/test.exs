@@ -27,6 +27,7 @@ config :logger, level: :warn
 config :phoenix, :plug_init_mode, :runtime
 
 # Thread cache config
+# You could adjust these attributes and run tests accordingly.
 config :yojee,
   use_thread_cache: true,
-  thread_cache_size: 3
+  popular_thread_count: 3

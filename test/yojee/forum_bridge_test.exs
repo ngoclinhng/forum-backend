@@ -9,7 +9,7 @@ defmodule Yojee.ForumBridgeTest do
 
   describe "create_thread/1" do
     setup do
-      start_supervised!(Yojee.ThreadCache)
+      start_cache_server()
       :ok
     end
 
@@ -60,7 +60,7 @@ defmodule Yojee.ForumBridgeTest do
 
   describe "create_post/1" do
     setup do
-      start_supervised!(Yojee.ThreadCache)
+      start_cache_server()
       thread = insert!(:thread)
       {:ok, %{thread: thread}}
     end
@@ -121,11 +121,11 @@ defmodule Yojee.ForumBridgeTest do
   end
 
   describe "list_popular_threads/1" do
-    @cache_size Application.fetch_env!(:yojee, :thread_cache_size)
+    @p_thread_count Application.fetch_env!(:yojee, :popular_thread_count)
     @thread_count 6
 
     setup do
-      start_supervised!(Yojee.ThreadCache)
+      start_cache_server()
 
       threads =
         1..@thread_count
@@ -141,12 +141,11 @@ defmodule Yojee.ForumBridgeTest do
       state =
         threads
         |> Enum.map(&({&1.id, &1.post_count}))
-        |> Enum.take(@cache_size)
 
       assert_cache_state_is(state)
     end
 
-    1..@cache_size
+    1..@p_thread_count
     |> Enum.each(fn count ->
       test "lists top #{count} threads", %{threads: threads} do
         count = unquote(count)
@@ -154,10 +153,6 @@ defmodule Yojee.ForumBridgeTest do
         assert ForumBridge.list_popular_threads(count) === expected
       end
     end)
-  end
-
-  defp assert_cache_state_is(state) do
-    assert :sys.get_state(Yojee.ThreadCache) === state
   end
 
   defp create_thread_with_posts(post_count) do
@@ -173,5 +168,4 @@ defmodule Yojee.ForumBridgeTest do
 
     struct(t, post_count: post_count)
   end
-
 end

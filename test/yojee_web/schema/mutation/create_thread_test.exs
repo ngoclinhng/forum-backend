@@ -13,7 +13,7 @@ defmodule YojeeWeb.Schema.Mutation.CreateThreadTest do
   """
 
   setup do
-    start_supervised!(Yojee.ThreadCache)
+    start_cache_server()
     :ok
   end
 
